@@ -25,6 +25,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('dataset/upload', 'Dataset::upload');   // Untuk form upload CSV
     $routes->get('dataset/export', 'Dataset::export');    // Untuk tombol export
     $routes->post('dataset/hapusSemua', 'Dataset::hapusSemua'); // Untuk tombol hapus semua
+    $routes->get('/dataset/delete/(:num)', 'Dataset::delete/$1');
 
     $routes->get('/klasifikasi', 'Klasifikasi::index');
     $routes->post('/klasifikasi/proses', 'Klasifikasi::proses');

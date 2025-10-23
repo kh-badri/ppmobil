@@ -184,17 +184,16 @@ class Dataset extends BaseController
      */
     public function delete($id = null)
     {
-        // Gunakan method spoofing, jadi kita cek method DELETE
-        if ($this->request->getMethod() === 'delete') {
-            $dataset = $this->datasetModel->find($id);
-            if ($dataset) {
-                $this->datasetModel->delete($id);
-                return redirect()->to('/dataset')->with('success', 'Data berhasil dihapus.');
-            }
-            return redirect()->to('/dataset')->with('error', 'Data tidak ditemukan.');
+        // PERBAIKAN: Hapus pengecekan metode request.
+        // Fungsi ini sekarang akan langsung memproses penghapusan via GET.
+        $dataset = $this->datasetModel->find($id);
+        if ($dataset) {
+            $this->datasetModel->delete($id);
+            return redirect()->to('/dataset')->with('success', 'Data berhasil dihapus.');
         }
-        // Redirect jika diakses dengan cara yang tidak seharusnya
-        return redirect()->to('/dataset')->with('error', 'Akses tidak diizinkan.');
+
+        // Baris ini akan dijalankan jika data dengan ID tersebut tidak ditemukan.
+        return redirect()->to('/dataset')->with('error', 'Data tidak ditemukan.');
     }
 
     /**

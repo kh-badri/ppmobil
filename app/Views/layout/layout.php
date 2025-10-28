@@ -60,8 +60,6 @@
     </style>
 </head>
 
-<!-- [PERUBAHAN] Tambahkan x-init="init()" untuk setup listener event -->
-
 <body class="bg-[#FDEBD0] text-gray-800 antialiased" x-data="layoutData()" x-init="init()">
 
     <!-- Page Loader -->
@@ -69,7 +67,7 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- Container Notifikasi Toast (HTML tidak berubah) -->
+    <!-- Container Notifikasi Toast -->
     <div x-show="toast.show"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 transform -translate-y-full"
@@ -87,10 +85,10 @@
         </div>
     </div>
 
-
+    <!-- Wrapper utama agar footer menempel di bawah -->
     <div class="min-h-screen flex flex-col">
 
-        <!-- NAVBAR (Tidak berubah) -->
+        <!-- NAVBAR -->
         <nav x-data="{ mobileMenuOpen: false, profileMenuOpen: false }" class="bg-white shadow-lg sticky top-0 z-50">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
@@ -163,7 +161,15 @@
             <?= $this->renderSection('content') ?>
         </main>
 
-    </div>
+        <!-- [BARU] FOOTER -->
+        <footer class="w-full mt-auto py-4 border-t bg-[#DC143C] border-gray-300"> <!-- mt-auto agar menempel ke bawah -->
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-100">
+                &copy; <?= date('Y') ?> RF Prediksi Permintaan Mobil. Dibuat oleh Anisya Syahputri.
+            </div>
+        </footer>
+        <!-- END: FOOTER -->
+
+    </div> <!-- Penutup div min-h-screen -->
 
     <!-- Script Alpine.js untuk Notifikasi -->
     <script>
@@ -174,7 +180,6 @@
                     message: '',
                     timeout: null
                 },
-                // Fungsi showToast tetap sama
                 showToast(message, duration = 3000) {
                     clearTimeout(this.toast.timeout);
                     this.toast.message = message;
@@ -183,11 +188,8 @@
                         this.toast.show = false;
                     }, duration);
                 },
-                // [BARU] Fungsi init untuk setup listener
                 init() {
-                    // Mendengarkan event 'show-toast' dari window
                     window.addEventListener('show-toast', event => {
-                        // Memanggil showToast dengan data dari event
                         this.showToast(event.detail.message);
                     });
                 }
@@ -198,11 +200,8 @@
             document.getElementById('page-loader').classList.add('hidden');
         });
 
-        // [PERUBAHAN] Menggunakan Custom Event untuk memicu notifikasi
         <?php if ($success = session()->getFlashdata('success')) : ?>
-            // Sedikit jeda agar Alpine siap
             setTimeout(() => {
-                // Dispatch event 'show-toast' dengan pesan dari flashdata
                 window.dispatchEvent(new CustomEvent('show-toast', {
                     detail: {
                         message: '<?= esc($success, 'js') ?>'

@@ -12,14 +12,20 @@ class History extends BaseController
     public function __construct()
     {
         $this->historyModel = new HistoryModel();
+        helper(['form', 'url']); // Tambahkan helper url untuk redirect
     }
 
+    /**
+     * Menampilkan halaman utama riwayat
+     */
     public function index()
     {
         $data = [
-            'title'   => 'Riwayat Klasifikasi',
-            'history' => $this->historyModel->orderBy('created_at', 'DESC')->findAll(),
+            'title'       => 'Riwayat Prediksi',
+            'history'     => $this->historyModel->orderBy('id', 'DESC')->findAll(),
+            'active_menu' => 'history'
         ];
+
         return view('history/index', $data);
     }
 
@@ -28,15 +34,40 @@ class History extends BaseController
      */
     public function delete($id = null)
     {
-        // PERBAIKAN: Hapus pengecekan metode request.
-        // Fungsi ini sekarang akan langsung memproses penghapusan.
-        $data = $this->historyModel->find($id);
-        if ($data) {
-            $this->historyModel->delete($id);
-            return redirect()->to('/history')->with('success', 'Data riwayat berhasil dihapus.');
+        // Validasi ID
+        if ($id === null || !is_numeric($id)) {
+            session()->setFlashdata('error', 'ID tidak valid.');
+            return redirect()->to(base_url('history'));
         }
 
-        // Baris ini akan dijalankan jika data dengan ID tersebut tidak ditemukan.
-        return redirect()->to('/history')->with('error', 'Data tidak ditemukan.');
+        // Cek apakah data ada
+        $data = $this->historyModel->find($id);
+
+        if ($data) {
+            // Hapus data
+            if ($this->historyModel->delete($id)) {
+                session()->setFlashdata('success', 'Data riwayat berhasil dihapus.');
+            } else {
+                session()->setFlashdata('error', 'Gagal menghapus data riwayat.');
+            }
+        } else {
+            session()->setFlashdata('error', 'Data riwayat tidak ditemukan.');
+        }
+
+        return redirect()->to(base_url('history'));
+    }
+
+    /**
+     * Menghapus semua data riwayat (opsional)
+     */
+    public function deleteAll()
+    {
+        if ($this->historyModel->truncate()) {
+            session()->setFlashdata('success', 'Semua data riwayat berhasil dihapus.');
+        } else {
+            session()->setFlashdata('error', 'Gagal menghapus semua data riwayat.');
+        }
+
+        return redirect()->to(base_url('history'));
     }
 }

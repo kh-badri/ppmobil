@@ -4,112 +4,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Klasifikasi KNN</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- [PERUBAHAN] Judul disesuaikan -->
+    <title>Login | RF Prediksi Permintaan Mobil</title>
+    <!-- [PERUBAHAN] Hapus SweetAlert, tambahkan Alpine.js -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+    <!-- [BARU] Style untuk notifikasi toast (minimalis) -->
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+<!-- [PERUBAHAN] Body diubah ke bg-[#FDEBD0] dan setup Alpine -->
 
-    <div class="bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm lg:max-w-4xl overflow-hidden">
-        <div class="flex flex-col lg:flex-row min-h-[550px]">
+<body class="bg-[#FDEBD0] min-h-screen flex items-center justify-center p-4" x-data="loginPageData()">
 
-            <!-- Kolom Form (Kiri) -->
-            <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
-                <div class="max-w-sm mx-auto w-full">
-                    <div class="text-left mb-8">
-                        <h1 class="text-2xl lg:text-3xl font-bold text-white mb-2">Login Akun</h1>
-                        <p class="text-gray-400 text-sm">Masuk untuk memulai klasifikasi.</p>
-                    </div>
-
-                    <form action="<?= base_url('/login') ?>" method="post" class="space-y-5">
-                        <?= csrf_field() ?>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                            <input type="text" name="username" required
-                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
-                                placeholder="Masukkan username Anda">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                            <input type="password" name="password" required
-                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
-                                placeholder="Masukkan password Anda">
-                        </div>
-
-                        <button type="submit"
-                            class="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 transition-colors duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                            Masuk
-                        </button>
-
-                        <div class="text-center pt-3">
-                            <p class="text-gray-400 text-sm">
-                                Belum punya akun?
-                                <a href="<?= site_url('register') ?>" class="text-teal-400 hover:text-teal-300 font-medium">
-                                    Daftar di sini
-                                </a>
-                            </p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Kolom Ilustrasi (Kanan) -->
-            <div class="lg:w-1/2 bg-gradient-to-br from-slate-900 to-slate-800 p-8 flex flex-col items-center justify-center text-center order-1 lg:order-2">
-
-                <div class="text-teal-400 mb-6">
-                    <!-- SVG Ilustrasi yang relevan dengan tema -->
-                    <svg class="w-24 h-24 lg:w-32 lg:h-32 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                    </svg>
-                </div>
-
-                <div>
-                    <h3 class="text-xl lg:text-2xl font-bold text-white mb-2 leading-tight">Klasifikasi Resiko Depresi (KNN)</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">
-                        Alat bantu untuk meningkatkan kesadaran diri terhadap kesehatan mental di era digital.
-                    </p>
-                </div>
-            </div>
-
+    <!-- [BARU] Container Notifikasi Toast (mirip layout.php) -->
+    <div x-show="toast.show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-full"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-full"
+        class="fixed top-0 left-0 right-0 z-[100] flex justify-center pt-5 px-4"
+        x-cloak>
+        <!-- Warna disesuaikan untuk error (merah tua), bisa diubah jika perlu -->
+        <div class="w-full max-w-sm bg-[#DC143C] text-white text-sm font-medium px-4 py-3 rounded-lg shadow-lg flex items-center justify-between">
+            <span x-text="toast.message"></span>
+            <button @click="toast.show = false" class="ml-4 text-white hover:text-gray-200">
+                &times;
+            </button>
         </div>
     </div>
 
-    <?php
-    // Blok PHP untuk notifikasi tidak perlu diubah
-    $successMessage = session()->getFlashdata('success');
-    if ($successMessage):
-    ?>
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '<?= esc($successMessage, 'js') ?>',
-                timer: 2000,
-                showConfirmButton: false,
-                background: '#1e293b', // slate-800
-                color: '#e2e8f0' // slate-200
-            }).then(() => {
-                window.location.href = "<?= base_url('/home') ?>";
-            });
-        </script>
-    <?php endif; ?>
+    <!-- [PERUBAHAN] Layout diubah ke satu kartu putih terpusat -->
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200">
+        <div class="p-8 lg:p-12">
 
-    <?php
-    $errorMessage = session()->getFlashdata('error');
-    if ($errorMessage) :
-    ?>
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Gagal',
-                text: '<?= esc($errorMessage, 'js') ?>',
-                background: '#1e293b',
-                color: '#e2e8f0'
-            });
-        </script>
-    <?php endif; ?>
+            <!-- Header Form -->
+            <div class="text-center mb-8">
+                <!-- Ikon disesuaikan -->
+                <svg class="h-12 w-12 text-[#DC143C] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v16.5h16.5M3.75 19.5h16.5M5.625 9.75h12.75M6 13.125h12M18.375 3l-3.75 3.75-3-3-3.75 3.75-3-3.75" />
+                </svg>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
+                <!-- Teks disesuaikan -->
+                <p class="text-gray-500 text-sm">Masuk ke akun Prediksi Permintaan Mobil Anda.</p>
+            </div>
+
+            <!-- Form Login -->
+            <form action="<?= base_url('/login') ?>" method="post" class="space-y-5">
+                <?= csrf_field() ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Username</label>
+                    <!-- Input disesuaikan ke tema terang -->
+                    <input type="text" name="username" required
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F75270] focus:border-[#DC143C] transition"
+                        placeholder="Masukkan username Anda">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Password</label>
+                    <input type="password" name="password" required
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F75270] focus:border-[#DC143C] transition"
+                        placeholder="Masukkan password Anda">
+                </div>
+
+                <!-- Tombol disesuaikan -->
+                <button type="submit"
+                    class="w-full bg-[#DC143C] text-white py-3 rounded-lg hover:bg-[#F75270] transition-colors duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    Masuk
+                </button>
+
+                <!-- Link Register -->
+                <div class="text-center pt-3">
+                    <p class="text-gray-500 text-sm">
+                        Belum punya akun?
+                        <!-- Link disesuaikan warnanya -->
+                        <a href="<?= site_url('register') ?>" class="text-[#DC143C] hover:text-[#F75270] font-medium">
+                            Daftar di sini
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- [BARU] Script Alpine.js untuk Notifikasi -->
+    <script>
+        function loginPageData() {
+            return {
+                toast: {
+                    show: false,
+                    message: '',
+                    timeout: null
+                },
+                showToast(message, duration = 3500) { // Durasi diperpanjang sedikit untuk error
+                    clearTimeout(this.toast.timeout);
+                    this.toast.message = message;
+                    this.toast.show = true;
+                    this.toast.timeout = setTimeout(() => {
+                        this.toast.show = false;
+                    }, duration);
+                }
+                // Tidak perlu init() karena kita panggil langsung dari PHP
+            }
+        }
+
+        // Panggil showToast jika ada flashdata error
+        <?php if ($errorMessage = session()->getFlashdata('error')) : ?>
+            // Sedikit jeda agar Alpine siap
+            setTimeout(() => {
+                // Akses data Alpine dari body dan panggil showToast
+                document.querySelector('body').__x.$data.showToast('<?= esc($errorMessage, 'js') ?>');
+            }, 100);
+        <?php endif; ?>
+
+        // Redirect jika ada flashdata success (setelah register/logout)
+        <?php if ($successMessage = session()->getFlashdata('success')) : ?>
+            // Tampilkan notifikasi sukses sebentar lalu redirect
+            setTimeout(() => {
+                document.querySelector('body').__x.$data.showToast('<?= esc($successMessage, 'js') ?>', 2000); // Tampilkan 2 detik
+                setTimeout(() => {
+                    // Redirect ke home setelah notifikasi sukses
+                    window.location.href = "<?= base_url('/') ?>"; // Arahkan ke home setelah sukses
+                }, 2100); // Redirect setelah toast hilang
+            }, 100);
+        <?php endif; ?>
+    </script>
 
 </body>
 

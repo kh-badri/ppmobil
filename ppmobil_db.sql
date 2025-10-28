@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 21, 2025 at 04:18 PM
+-- Generation Time: Oct 28, 2025 at 10:06 AM
 -- Server version: 5.7.44
 -- PHP Version: 8.3.16
 
@@ -18,55 +18,46 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `depresi_db`
+-- Database: `ppmobil_db`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `dataset`
+-- Table structure for table `dataset_mobil`
 --
 
-CREATE TABLE `dataset` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `durasi_layar` float(5,1) NOT NULL,
-  `durasi_sosmed` float(5,1) NOT NULL,
-  `durasi_tidur` float(5,1) NOT NULL,
-  `resiko_depresi` varchar(50) NOT NULL,
+CREATE TABLE `dataset_mobil` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `bulan_tahun` varchar(10) NOT NULL,
+  `pendapatan_per_kapita` decimal(18,2) NOT NULL,
+  `tingkat_inflasi` decimal(5,2) NOT NULL,
+  `suku_bunga_kredit` decimal(5,2) NOT NULL,
+  `jumlah_penduduk` decimal(10,2) NOT NULL,
+  `usia_produktif` decimal(10,2) NOT NULL,
+  `tingkat_urbanisasi` decimal(5,2) NOT NULL,
+  `permintaan_mobil` int(11) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `dataset`
---
-
-INSERT INTO `dataset` (`id`, `durasi_layar`, `durasi_sosmed`, `durasi_tidur`, `resiko_depresi`, `created_at`, `updated_at`) VALUES
-(1, 6.0, 7.0, 6.0, 'Tinggi', '2025-10-21 16:17:19', '2025-10-21 16:17:19');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `history`
+-- Table structure for table `history_prediksi`
 --
 
-CREATE TABLE `history` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `durasi_layar` float(5,1) NOT NULL,
-  `durasi_sosmed` float(5,1) NOT NULL,
-  `durasi_tidur` float(5,1) NOT NULL,
-  `k` int(5) NOT NULL,
-  `hasil_klasifikasi` varchar(50) NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL
+CREATE TABLE `history_prediksi` (
+  `id` int(11) NOT NULL,
+  `pendapatan_per_kapita` decimal(15,2) DEFAULT NULL,
+  `tingkat_inflasi` decimal(5,2) DEFAULT NULL,
+  `suku_bunga_kredit` decimal(5,2) DEFAULT NULL,
+  `jumlah_penduduk` decimal(10,2) DEFAULT NULL,
+  `usia_produktif` decimal(5,2) DEFAULT NULL,
+  `tingkat_urbanisasi` decimal(5,2) DEFAULT NULL,
+  `hasil_prediksi` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `history`
---
-
-INSERT INTO `history` (`id`, `durasi_layar`, `durasi_sosmed`, `durasi_tidur`, `k`, `hasil_klasifikasi`, `created_at`, `updated_at`) VALUES
-(3, 7.0, 5.0, 6.0, 3, 'Tinggi', '2025-10-21 16:06:32', '2025-10-21 16:06:32');
 
 -- --------------------------------------------------------
 
@@ -90,22 +81,22 @@ CREATE TABLE `login` (
 INSERT INTO `login` (`id`, `username`, `password`, `nama_lengkap`, `email`, `foto`) VALUES
 (5, 'badri', '$2y$10$ufHMCOpxBb4qWPM/DNxFp.iWNGrDq6ACJ.X3zJ1VB32M5vj8cZY1O', 'cek cekkk', 'khbadri22@gmail.com', '1753267234_9fe1376f34640f12d145.png'),
 (8, 'alwi', '$2y$10$.5reV2X6wsjO9qBJQZp0bOP9YgZ7ieSvPltgMONhZK8TVL//v3Kci', 'alwi', 'alwi@gmail.com', '1758871250_c08f82ff61370606e844.png'),
-(9, 'admin', '$2y$10$XsbW/03O5RH2ku1KU2Pscu377BMAVlBdt.Slcm6zSxXloRahTTqjS', 'sayadmin', 'admin225@gmail.com', '1761063392_2a0ed935235082d568a1.png');
+(9, 'admin', '$2y$10$XsbW/03O5RH2ku1KU2Pscu377BMAVlBdt.Slcm6zSxXloRahTTqjS', 'sayadmin', 'admin225@gmail.com', '1761645445_818f865943734f813699.png');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `dataset`
+-- Indexes for table `dataset_mobil`
 --
-ALTER TABLE `dataset`
+ALTER TABLE `dataset_mobil`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `history`
+-- Indexes for table `history_prediksi`
 --
-ALTER TABLE `history`
+ALTER TABLE `history_prediksi`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -119,16 +110,16 @@ ALTER TABLE `login`
 --
 
 --
--- AUTO_INCREMENT for table `dataset`
+-- AUTO_INCREMENT for table `dataset_mobil`
 --
-ALTER TABLE `dataset`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `dataset_mobil`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `history`
+-- AUTO_INCREMENT for table `history_prediksi`
 --
-ALTER TABLE `history`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `history_prediksi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `login`

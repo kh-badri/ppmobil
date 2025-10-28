@@ -6,13 +6,17 @@ use App\Controllers\BaseController;
 use App\Models\DatasetModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
+/**
+ * Controller ini diadaptasi dari kode Anda untuk mengelola
+ * dataset prediksi permintaan mobil.
+ */
 class Dataset extends BaseController
 {
     protected $datasetModel;
 
     public function __construct()
     {
-        // Inisialisasi Model di constructor agar bisa dipakai di semua method
+        // Inisialisasi Model
         $this->datasetModel = new DatasetModel();
     }
 
@@ -22,8 +26,9 @@ class Dataset extends BaseController
     public function index()
     {
         $data = [
-            'title'   => 'Manajemen Data Latih (Dataset)',
+            'title'   => 'Manajemen Data Latih (Dataset) Mobil',
             'dataset' => $this->datasetModel->findAll(), // Ambil semua data
+            'active_menu' => 'dataset'
         ];
 
         return view('dataset/index', $data); // Pastikan view ada di 'app/Views/dataset/index.php'
@@ -34,12 +39,16 @@ class Dataset extends BaseController
      */
     public function save()
     {
-        // Validasi input
+        // Validasi input disesuaikan dengan 7 fitur + 1 target
         $rules = [
-            'durasi_layar'   => 'required|numeric',
-            'durasi_sosmed'  => 'required|numeric',
-            'durasi_tidur'   => 'required|numeric',
-            'resiko_depresi' => 'required|in_list[Rendah,Sedang,Tinggi]',
+            'bulan_tahun'           => 'required|string|max_length[7]', // Format YYYY-MM
+            'pendapatan_per_kapita' => 'required|numeric',
+            'tingkat_inflasi'       => 'required|numeric',
+            'suku_bunga_kredit'   => 'required|numeric',
+            'jumlah_penduduk'     => 'required|numeric',
+            'usia_produktif'      => 'required|numeric',
+            'tingkat_urbanisasi'  => 'required|numeric',
+            'permintaan_mobil'    => 'required|numeric|integer', // Target (y)
         ];
 
         if (!$this->validate($rules)) {
@@ -49,10 +58,14 @@ class Dataset extends BaseController
 
         // Simpan data ke database menggunakan model
         $this->datasetModel->save([
-            'durasi_layar'   => $this->request->getPost('durasi_layar'),
-            'durasi_sosmed'  => $this->request->getPost('durasi_sosmed'),
-            'durasi_tidur'   => $this->request->getPost('durasi_tidur'),
-            'resiko_depresi' => $this->request->getPost('resiko_depresi'),
+            'bulan_tahun'           => $this->request->getPost('bulan_tahun'),
+            'pendapatan_per_kapita' => $this->request->getPost('pendapatan_per_kapita'),
+            'tingkat_inflasi'       => $this->request->getPost('tingkat_inflasi'),
+            'suku_bunga_kredit'   => $this->request->getPost('suku_bunga_kredit'),
+            'jumlah_penduduk'     => $this->request->getPost('jumlah_penduduk'),
+            'usia_produktif'      => $this->request->getPost('usia_produktif'),
+            'tingkat_urbanisasi'  => $this->request->getPost('tingkat_urbanisasi'),
+            'permintaan_mobil'    => $this->request->getPost('permintaan_mobil'),
         ]);
 
         return redirect()->to('/dataset')->with('success', 'Data berhasil ditambahkan!');
@@ -63,68 +76,56 @@ class Dataset extends BaseController
      */
     public function upload()
     {
-        // 1. Validasi File
-        $validationRule = [
-            'dataset_csv' => [
-                'label' => 'File CSV',
-                'rules' => 'uploaded[dataset_csv]'
-                    . '|ext_in[dataset_csv,csv]'
-                    . '|max_size[dataset_csv,2048]', // max 2MB
-            ],
-        ];
-
-        if (!$this->validate($validationRule)) {
-            return redirect()->to('/dataset')->withInput()->with('error', $this->validator->getErrors()['dataset_csv']);
-        }
-
         $file = $this->request->getFile('dataset_csv');
 
-        // Cek apakah file valid dan benar-benar bisa dibaca sebelum diproses
-        if (!$file->isValid() || $file->hasMoved()) {
-            return redirect()->to('/dataset')->with('error', 'Terjadi masalah saat mengupload file.');
+        if ($file === null || !$file->isValid() || !in_array($file->getMimeType(), ['text/csv', 'application/csv'])) {
+            return redirect()->to('/dataset')->with('error', 'Upload gagal. Pastikan Anda memilih file CSV yang valid.');
         }
 
-        // 2. Baca file CSV dengan lebih aman
         $filePath = $file->getRealPath();
-        if ($filePath === false) {
-            return redirect()->to('/dataset')->with('error', 'Gagal mendapatkan path file sementara.');
-        }
-
         $fileContent = file($filePath);
         if ($fileContent === false) {
             return redirect()->to('/dataset')->with('error', 'Gagal membaca isi file CSV.');
         }
+
         $csvData = array_map('str_getcsv', $fileContent);
 
-        // Hapus baris header
-        array_shift($csvData);
+        array_shift($csvData); // Hapus header
 
         $dataToInsert = [];
         $insertedCount = 0;
 
-        // 3. Looping setiap baris data
         foreach ($csvData as $row) {
-            // Pastikan baris tidak kosong untuk menghindari error
             if (empty($row) || empty($row[0])) {
                 continue;
             }
 
-            // PENTING: Sesuaikan indeks [ ] dengan urutan kolom di file CSV Anda
-            // Asumsi struktur CSV: user_id,age,gender,durasi_layar,durasi_sosmed,durasi_tidur,resiko_depresi
+            // Fungsi pembersihan data
+            $cleanPendapatan = (float) str_replace([',', ' '], '', $row[1] ?? 0);
+
+            // ==== PERBAIKAN PENTING DI SINI ====
+            // Simpan 'jumlah_penduduk' dan 'usia_produktif' sebagai FLOAT
             $dataToInsert[] = [
-                'durasi_layar'   => (float) ($row[3] ?? 0),
-                'durasi_sosmed'  => (float) ($row[4] ?? 0),
-                'durasi_tidur'   => (float) ($row[5] ?? 0),
-                'resiko_depresi' => trim($row[6] ?? 'Rendah'),
+                'bulan_tahun'           => trim($row[0] ?? ''),
+                'pendapatan_per_kapita' => $cleanPendapatan,
+                'tingkat_inflasi'       => (float) ($row[2] ?? 0),
+                'suku_bunga_kredit'     => (float) ($row[3] ?? 0),
+                'jumlah_penduduk'       => (float) ($row[4] ?? 0), // <-- UBAH KE FLOAT
+                'usia_produktif'        => (float) ($row[5] ?? 0), // <-- UBAH KE FLOAT
+                'tingkat_urbanisasi'    => (float) ($row[6] ?? 0),
+                'permintaan_mobil'      => (int) ($row[7] ?? 0),
             ];
+            // ===================================
         }
 
-        // 4. Simpan data secara massal (batch insert) jika ada data yang akan dimasukkan
         if (!empty($dataToInsert)) {
             try {
+                // Hapus data lama sebelum insert baru agar konsisten
+                $this->datasetModel->emptyTable();
+                $this->datasetModel->db->query("ALTER TABLE dataset_mobil AUTO_INCREMENT = 1");
+
                 $insertedCount = $this->datasetModel->insertBatch($dataToInsert);
             } catch (\Exception $e) {
-                // Tangkap jika ada error dari database
                 return redirect()->to('/dataset')->with('error', 'Terjadi error saat menyimpan ke database: ' . $e->getMessage());
             }
         }
@@ -135,42 +136,24 @@ class Dataset extends BaseController
     /**
      * Menghapus semua data dari tabel dataset.
      */
-    /**
-     * Menghapus semua data dari tabel dataset.
-     */
-    /**
-     * Menghapus semua data dari tabel dataset.
-     */
     public function hapusSemua()
     {
-        // Terima POST atau DELETE method
         $method = strtolower($this->request->getMethod());
+        $spoofedMethod = strtolower($this->request->getPost('_method') ?? '');
 
-        // Jika bukan POST/DELETE, coba cek apakah ada method spoofing
-        if (!in_array($method, ['post', 'delete'])) {
-            // Cek _method dari form (method spoofing CI4)
-            $spoofedMethod = strtolower($this->request->getPost('_method') ?? '');
-            if (!in_array($spoofedMethod, ['post', 'delete'])) {
-                log_message('debug', 'hapusSemua - Method tidak valid: ' . $method);
-                return redirect()->to('/dataset')->with('error', 'Akses tidak diizinkan.');
-            }
+        if (!in_array($method, ['post', 'delete']) && !in_array($spoofedMethod, ['post', 'delete'])) {
+            return redirect()->to('/dataset')->with('error', 'Akses tidak diizinkan.');
         }
 
         try {
-            // Ambil nama tabel dari model
             $tableName = $this->datasetModel->table;
-
-            // Cek jumlah data sebelum dihapus
             $countBefore = $this->datasetModel->countAllResults(false);
 
             if ($countBefore == 0) {
                 return redirect()->to('/dataset')->with('info', 'Tidak ada data untuk dihapus.');
             }
 
-            // Metode 1: Menggunakan emptyTable() - paling efektif untuk menghapus semua data
             $this->datasetModel->emptyTable();
-
-            // Reset auto-increment
             $this->datasetModel->db->query("ALTER TABLE {$tableName} AUTO_INCREMENT = 1");
 
             return redirect()->to('/dataset')->with('success', "Semua data berhasil dihapus ({$countBefore} baris).");
@@ -179,20 +162,19 @@ class Dataset extends BaseController
             return redirect()->to('/dataset')->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
     }
+
     /**
      * Menghapus satu baris data berdasarkan ID.
      */
     public function delete($id = null)
     {
-        // PERBAIKAN: Hapus pengecekan metode request.
-        // Fungsi ini sekarang akan langsung memproses penghapusan via GET.
+        // Anda bisa menggunakan link GET biasa atau form POST/DELETE
         $dataset = $this->datasetModel->find($id);
         if ($dataset) {
             $this->datasetModel->delete($id);
             return redirect()->to('/dataset')->with('success', 'Data berhasil dihapus.');
         }
 
-        // Baris ini akan dijalankan jika data dengan ID tersebut tidak ditemukan.
         return redirect()->to('/dataset')->with('error', 'Data tidak ditemukan.');
     }
 
@@ -202,18 +184,28 @@ class Dataset extends BaseController
     public function export()
     {
         $data = $this->datasetModel->findAll();
-        $filename = 'export_dataset_' . date('Y-m-d') . '.csv';
+        $filename = 'export_dataset_mobil_' . date('Y-m-d') . '.csv';
 
-        // Set header untuk memicu download di browser
         header("Content-Description: File Transfer");
         header("Content-Disposition: attachment; filename=$filename");
         header("Content-Type: application/csv; ");
 
-        // Buka output stream PHP untuk menulis file
         $file = fopen('php://output', 'w');
 
-        // Tulis baris header
-        $header = ['id', 'durasi_layar', 'durasi_sosmed', 'durasi_tidur', 'resiko_depresi', 'created_at', 'updated_at'];
+        // Tulis baris header (sesuai dengan field model)
+        $header = [
+            'id',
+            'bulan_tahun',
+            'pendapatan_per_kapita',
+            'tingkat_inflasi',
+            'suku_bunga_kredit',
+            'jumlah_penduduk',
+            'usia_produktif',
+            'tingkat_urbanisasi',
+            'permintaan_mobil',
+            'created_at',
+            'updated_at'
+        ];
         fputcsv($file, $header);
 
         // Tulis data baris per baris
@@ -222,7 +214,6 @@ class Dataset extends BaseController
         }
 
         fclose($file);
-        // Hentikan eksekusi skrip agar tidak ada output lain yang tercetak
         exit;
     }
 }

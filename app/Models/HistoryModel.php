@@ -6,17 +6,21 @@ use CodeIgniter\Model;
 
 class HistoryModel extends Model
 {
-    protected $table            = 'history';
+    protected $table            = 'history_prediksi';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $allowedFields    = [
-        'durasi_layar',
-        'durasi_sosmed',
-        'durasi_tidur',
-        'k',
-        'hasil_klasifikasi'
+        'pendapatan_per_kapita',
+        'tingkat_inflasi',
+        'suku_bunga_kredit',
+        'jumlah_penduduk',
+        'usia_produktif',
+        'tingkat_urbanisasi',
+        'hasil_prediksi'
     ];
 
-    // Mengaktifkan auto-timestamps
+    // Menggunakan created_at secara otomatis
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = ''; // Kita tidak perlu updated_at
 }

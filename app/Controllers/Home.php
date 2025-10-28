@@ -11,7 +11,7 @@ class Home extends BaseController
     {
         // Menyiapkan data untuk dikirim ke view
         $data = [
-            'title'       => 'Beranda | Aplikasi Klasifikasi KNN',
+            'title'       => 'Beranda | Aplikasi Prediksi Permintaan Mobil',
             'active_menu' => 'home' // Variabel untuk menandai menu 'home' aktif
         ];
 

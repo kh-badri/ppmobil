@@ -1,151 +1,195 @@
 <?= $this->extend('layout/layout'); ?>
 <?= $this->section('content'); ?>
 
-<div class="container mx-auto p-4 lg:p-8 text-gray-400">
+<!-- Latar belakang utama diubah menjadi krem #FDEBD0 -->
+<div class="w-full min-h-screen bg-[#FDEBD0] p-4 lg:p-8 text-gray-800">
+    <div class="container mx-auto">
 
-    <h1 class="text-3xl font-bold mb-6 text-teal-700">Manajemen Dataset</h1>
+        <!-- Judul Halaman -->
+        <h1 class="text-4xl font-bold mb-6 text-[#DC143C]">
+            Manajemen Dataset_csv 📊
+        </h1>
 
-    <!-- Notifikasi (Digabung menjadi satu blok) -->
-    <?php if (session()->getFlashdata('success') || session()->getFlashdata('error')) : ?>
-        <?php $isError = session()->getFlashdata('error'); ?>
-        <div class="<?= $isError ? 'bg-red-500 border-red-700' : 'bg-teal-500 border-teal-700' ?> border-l-4 text-white p-4 mb-6 rounded-md shadow-lg" role="alert">
-            <p class="font-bold"><?= $isError ? 'Error' : 'Sukses' ?></p>
-            <p><?= $isError ?: session()->getFlashdata('success') ?></p>
-        </div>
-    <?php endif; ?>
 
-    <!-- Bagian Aksi Cepat -->
-    <div class="bg-slate-800 p-6 rounded-lg shadow-xl mb-8">
-        <h2 class="text-xl font-semibold mb-4 border-b border-gray-600 pb-2">Aksi Cepat</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Layout 2 Kolom untuk Form dan Aksi -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
 
-            <!-- Form Impor CSV -->
-            <form action="<?= base_url('dataset/upload') ?>" method="post" enctype="multipart/form-data" class="flex flex-col space-y-3">
-                <?= csrf_field() ?>
-                <label for="dataset_csv" class="font-medium">Impor dari CSV:</label>
-                <input type="file" name="dataset_csv" id="dataset_csv" required class="block w-full text-sm text-gray-400
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-teal-100 file:text-teal-700
-                    hover:file:bg-teal-200 transition">
-                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-md">
-                    Upload & Simpan
-                </button>
-            </form>
+            <!-- Kolom Kiri: Form Tambah Data Manual -->
+            <div class="lg:col-span-1">
+                <!-- Style kartu disamakan dengan halaman history -->
+                <div class="bg-white p-6 rounded-xl shadow-2xl border border-gray-200 h-full">
+                    <h2 class="text-2xl font-semibold mb-4 border-b border-gray-200 pb-2 text-gray-800">Tambah Data Manual</h2>
+                    <form action="<?= base_url('dataset/save') ?>" method="post">
+                        <?= csrf_field() ?>
+                        <!-- Layout responsif 2 kolom untuk form input -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <!-- Tombol Ekspor -->
-            <div class="flex flex-col space-y-3 justify-end">
-                <label class="font-medium">Ekspor ke CSV:</label>
-                <a href="<?= base_url('dataset/export') ?>" class="w-full text-center bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-md">
-                    Download Dataset
-                </a>
-            </div>
+                            <div class="md:col-span-2">
+                                <label for="bulan_tahun" class="block mb-2 text-sm font-medium text-gray-600">Bulan-Tahun (Contoh: Jan-24)</label>
+                                <!-- Input style disamakan dengan halaman prediksi -->
+                                <input type="text" name="bulan_tahun" placeholder="Contoh: Jan-24" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="pendapatan_per_kapita" class="block mb-2 text-sm font-medium text-gray-600">Pendapatan/Kapita</label>
+                                <input type="number" step="any" name="pendapatan_per_kapita" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="tingkat_inflasi" class="block mb-2 text-sm font-medium text-gray-600">Inflasi (%)</label>
+                                <input type="number" step="any" name="tingkat_inflasi" placeholder="3.5" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="suku_bunga_kredit" class="block mb-2 text-sm font-medium text-gray-600">Suku Bunga (%)</label>
+                                <input type="number" step="any" name="suku_bunga_kredit" placeholder="6.0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="jumlah_penduduk" class="block mb-2 text-sm font-medium text-gray-600">Jml Penduduk (Jt)</label>
+                                <input type="number" step="any" name="jumlah_penduduk" placeholder="14.5" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="usia_produktif" class="block mb-2 text-sm font-medium text-gray-600">Usia Produktif (%)</label>
+                                <input type="number" step="any" name="usia_produktif" placeholder="60.0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
+                            <div>
+                                <label for="tingkat_urbanisasi" class="block mb-2 text-sm font-medium text-gray-600">Urbanisasi (%)</label>
+                                <input type="number" step="any" name="tingkat_urbanisasi" placeholder="58.0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
 
-            <!-- Form Hapus Semua Data -->
-            <div class="flex flex-col space-y-3 justify-end">
-                <label class="font-medium">Hapus Semua Data:</label>
-                <form action="<?= base_url('dataset/hapusSemua') ?>" method="post" onsubmit="return confirm('PERINGATAN! Anda yakin ingin menghapus semua data secara permanen? Aksi ini tidak dapat dibatalkan.');">
-                    <?= csrf_field() ?>
-                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-md">
-                        Hapus Semua
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+                            <!-- Target (y) Dibuat Menonjol -->
+                            <div class="md:col-span-2">
+                                <!-- Warna disamakan dengan warna utama #DC143C -->
+                                <label for="permintaan_mobil" class="block mb-2 text-sm font-bold text-[#DC143C]">TARGET: Permintaan (Unit)</label>
+                                <input type="number" name="permintaan_mobil" placeholder="12500" class="bg-white border-2 border-[#DC143C] text-gray-900 text-sm rounded-lg focus:ring-[#F75270] focus:border-[#DC143C] block w-full p-2.5" required>
+                            </div>
 
-    <!-- Form Tambah Data Manual -->
-    <div class="bg-slate-800 p-6 rounded-lg shadow-xl mb-8">
-        <h2 class="text-xl font-semibold mb-4 border-b border-gray-600 pb-2">Tambah Data Manual</h2>
-        <form action="<?= base_url('dataset/save') ?>" method="post">
-            <?= csrf_field() ?>
-            <!-- Layout responsif untuk form input -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="sm:col-span-1">
-                    <label for="durasi_layar" class="block mb-2 text-sm font-medium text-gray-300">Durasi Layar (jam)</label>
-                    <input type="number" step="0.1" name="durasi_layar" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="durasi_sosmed" class="block mb-2 text-sm font-medium text-gray-300">Durasi Sosmed (jam)</label>
-                    <input type="number" step="0.1" name="durasi_sosmed" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="durasi_tidur" class="block mb-2 text-sm font-medium text-gray-300">Durasi Tidur (jam)</label>
-                    <input type="number" step="0.1" name="durasi_tidur" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="resiko_depresi" class="block mb-2 text-sm font-medium text-gray-300">Resiko Depresi</label>
-                    <select name="resiko_depresi" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5" required>
-                        <option value="">-- Pilih --</option>
-                        <option value="Rendah">Rendah</option>
-                        <option value="Sedang">Sedang</option>
-                        <option value="Tinggi">Tinggi</option>
-                    </select>
-                </div>
-                <!-- Tombol diatur agar selalu di paling bawah dan full width di mobile -->
-                <div class="sm:col-span-2 lg:col-span-1 flex items-end">
-                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg transition duration-300 shadow-md">
-                        Simpan
-                    </button>
+                            <!-- Tombol Submit -->
+                            <div class="md:col-span-2 flex items-end">
+                                <!-- Tombol utama diubah jadi #DC143C -->
+                                <button type="submit" class="w-full bg-[#DC143C] hover:bg-[#F75270] text-white font-bold py-2.5 px-6 rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+                                    Simpan Data
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </div>
 
-    <!-- Tabel Data -->
-    <div class="bg-slate-800 rounded-lg shadow-xl overflow-hidden">
-        <div class="p-6">
-            <h2 class="text-xl font-semibold">Isi Tabel Dataset</h2>
+            <!-- Kolom Kanan: Aksi Cepat -->
+            <div class="lg:col-span-2">
+                <div class="bg-white p-6 rounded-xl shadow-2xl border border-gray-200 h-full">
+                    <h2 class="text-2xl font-semibold mb-4 border-b border-gray-200 pb-2 text-gray-800">Aksi Cepat</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        <!-- Form Impor CSV -->
+                        <form action="<?= base_url('dataset/upload') ?>" method="post" enctype="multipart/form-data" class="flex flex-col space-y-3 p-4 border border-gray-200 rounded-lg">
+                            <?= csrf_field() ?>
+                            <label for="dataset_csv" class="font-medium text-gray-700">Impor dari CSV:</label>
+                            <input type="file" name="dataset_csv" id="dataset_csv" required class="block w-full text-sm text-gray-700
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-[#FDEBD0] file:text-[#DC143C]
+                                hover:file:bg-[#F75270] hover:file:text-white transition duration-300 cursor-pointer">
+                            <!-- Tombol utama diubah jadi #DC143C -->
+                            <button type="submit" class="w-full bg-[#DC143C] hover:bg-[#F75270] text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+                                Upload & Simpan
+                            </button>
+                        </form>
+
+                        <!-- Tombol Ekspor -->
+                        <div class="flex flex-col space-y-3 justify-between p-4 border border-gray-200 rounded-lg">
+                            <label class="font-medium text-gray-700">Ekspor ke CSV:</label>
+                            <p class="text-sm text-gray-500">Unduh semua data dalam tabel sebagai satu file CSV.</p>
+                            <!-- Tombol Ekspor diganti dengan style palet warna -->
+                            <a href="<?= base_url('dataset/export') ?>" class="w-full text-center bg-transparent border border-[#F75270] text-[#F75270] hover:bg-[#F75270] hover:text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+                                Download Dataset
+                            </a>
+                        </div>
+
+                        <!-- Form Hapus Semua Data -->
+                        <div class="flex flex-col space-y-3 justify-between p-4 border border-gray-200 rounded-lg bg-red-50">
+                            <label class="font-medium text-gray-700">Hapus Semua Data:</label>
+                            <p class="text-sm text-red-700">Aksi ini akan menghapus permanen semua data latih.</p>
+                            <form action="<?= base_url('dataset/hapusSemua') ?>" method="post" onsubmit="return confirm('PERINGATAN! Anda yakin ingin menghapus semua data? Aksi ini tidak dapat dibatalkan.');">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="_method" value="DELETE">
+                                <!-- Tombol Hapus sudah benar menggunakan #DC143C -->
+                                <button type="submit" class="w-full bg-[#DC143C] hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-lg transform hover:scale-105">
+                                    Hapus Semua
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <!-- Wrapper untuk scroll horizontal di layar kecil -->
-        <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-300">
-                <thead class="text-xs text-white uppercase bg-gray-700">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">ID</th>
-                        <th scope="col" class="px-6 py-3">Durasi Layar</th>
-                        <th scope="col" class="px-6 py-3">Durasi Sosmed</th>
-                        <th scope="col" class="px-6 py-3">Durasi Tidur</th>
-                        <th scope="col" class="px-6 py-3">Resiko Depresi</th>
-                        <th scope="col" class="px-6 py-3 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($dataset)) : ?>
-                        <tr class="bg-slate-800 border-b border-gray-700">
-                            <td colspan="6" class="px-6 py-4 text-center">Data masih kosong.</td>
+
+
+        <!-- Tabel Data (Kartu Putih) - Tampilan Baru -->
+        <div class="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Isi Tabel Dataset</h2>
+            </div>
+            <!-- Wrapper untuk scroll horizontal di layar kecil -->
+            <div class="relative overflow-x-auto">
+                <!-- Header tabel sudah benar menggunakan #DC143C -->
+                <table class="w-full text-sm text-left text-gray-700">
+                    <thead class="text-xs text-white uppercase bg-[#DC143C]">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">ID</th>
+                            <th scope="col" class="px-4 py-3">Bulan-Tahun</th>
+                            <th scope="col" class="px-4 py-3">Pendapatan/Kapita</th>
+                            <th scope="col" class="px-4 py-3">Inflasi</th>
+                            <th scope="col" class="px-4 py-3">Suku Bunga</th>
+                            <th scope="col" class="px-4 py-3">Jml Penduduk</th>
+                            <th scope="col" class="px-4 py-3">Usia Produktif</th>
+                            <th scope="col" class="px-4 py-3">Urbanisasi</th>
+                            <th scope="col" class="px-4 py-3">Permintaan (Unit)</th>
+                            <th scope="col" class="px-4 py-3 text-center">Aksi</th>
                         </tr>
-                    <?php else : ?>
-                        <?php foreach ($dataset as $row) : ?>
-                            <tr class="bg-slate-800 border-b border-gray-700 hover:bg-gray-700">
-                                <th scope="row" class="px-6 py-4 font-medium text-white whitespace-nowrap"><?= $row['id'] ?></th>
-                                <td class="px-6 py-4 whitespace-nowrap"><?= $row['durasi_layar'] ?> jam</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?= $row['durasi_sosmed'] ?> jam</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?= $row['durasi_tidur'] ?> jam</td>
-                                <td class="px-6 py-4 font-semibold whitespace-nowrap 
-                                    <?php
-                                    if ($row['resiko_depresi'] == 'Tinggi') echo 'text-red-400';
-                                    elseif ($row['resiko_depresi'] == 'Sedang') echo 'text-yellow-400';
-                                    else echo 'text-green-400';
-                                    ?>">
-                                    <?= $row['resiko_depresi'] ?>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <form action="<?= base_url('dataset/delete/' . $row['id']) ?>" method="post" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');">
-                                        <?= csrf_field() ?>
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="font-medium text-red-500 hover:text-red-700 transition duration-300">Hapus</button>
-                                    </form>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($dataset)) : ?>
+                            <tr class="bg-white border-b border-gray-200">
+                                <td colspan="10" class="px-6 py-4 text-center text-gray-500">
+                                    Data masih kosong. Silakan tambah data manual atau upload CSV.
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        <?php else : ?>
+                            <?php $i = 0;
+                            foreach ($dataset as $row) : $i++; ?>
+                                <!-- Zebra-striping dan hover disamakan dengan history -->
+                                <tr class="<?= ($i % 2 == 0) ? 'bg-gray-50' : 'bg-white' ?> border-b border-gray-200 hover:bg-pink-50 transition duration-150">
+                                    <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap"><?= $row['id'] ?></th>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= esc($row['bulan_tahun']) ?></td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= number_format($row['pendapatan_per_kapita'], 0, ',', '.') ?></td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= esc($row['tingkat_inflasi']) ?>%</td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= esc($row['suku_bunga_kredit']) ?>%</td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= number_format($row['jumlah_penduduk'], 0, ',', '.') ?></td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= number_format($row['usia_produktif'], 0, ',', '.') ?></td>
+                                    <td class="px-4 py-3 whitespace-nowrap"><?= esc($row['tingkat_urbanisasi']) ?>%</td>
+                                    <!-- Target diubah ke #DC143C agar konsisten -->
+                                    <td class="px-4 py-3 whitespace-nowrap font-bold text-[#DC143C]">
+                                        <?= number_format($row['permintaan_mobil'], 0, ',', '.') ?>
+                                    </td>
+                                    <td class="px-4 py-3 text-center whitespace-nowrap">
+                                        <form action="<?= base_url('dataset/delete/' . $row['id']) ?>" method="post" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="bg-[#DC143C] text-white text-xs font-medium py-1 px-3 rounded-full hover:bg-red-700 transition duration-300">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
 <?= $this->endSection(); ?>

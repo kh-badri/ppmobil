@@ -18,24 +18,26 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('akun/update_profil', 'Akun::updateProfil');
     $routes->post('akun/update_sandi', 'Akun::updateSandi');
 
-    // --- RUTE UNTUK DATASET (SUDAH DIPERBAIKI) ---
-    // Mendefinisikan rute secara manual agar sesuai persis dengan controller dan view
-    $routes->get('dataset', 'Dataset::index');
-    $routes->post('dataset/save', 'Dataset::save');       // Untuk form tambah manual
-    $routes->post('dataset/upload', 'Dataset::upload');   // Untuk form upload CSV
-    $routes->get('dataset/export', 'Dataset::export');    // Untuk tombol export
-    $routes->post('dataset/hapusSemua', 'Dataset::hapusSemua'); // Untuk tombol hapus semua
-    $routes->get('/dataset/delete/(:num)', 'Dataset::delete/$1');
+    // Rute Dataset
+    $routes->get('/dataset', 'Dataset::index');
+    $routes->post('/dataset/save', 'Dataset::save');
+    $routes->post('/dataset/upload', 'Dataset::upload');
+    $routes->delete('/dataset/hapusSemua', 'Dataset::hapusSemua');
+    $routes->post('/dataset/hapusSemua', 'Dataset::hapusSemua'); // Fallback
+    $routes->delete('/dataset/delete/(:num)', 'Dataset::delete/$1');
+    $routes->post('/dataset/delete/(:num)', 'Dataset::delete/$1'); // Fallback
+    $routes->get('/dataset/export', 'Dataset::export');
 
-    $routes->get('/klasifikasi', 'Klasifikasi::index');
-    $routes->post('/klasifikasi/proses', 'Klasifikasi::proses');
-    $routes->post('/klasifikasi/simpan', 'Klasifikasi::simpan');
 
-    // ... (kode routes lainnya)
+    // Rute Prediksi
+    $routes->get('/prediksi', 'Prediksi::index');
+    $routes->post('/prediksi/run', 'Prediksi::run');
+    $routes->post('/prediksi/simpan', 'Prediksi::simpan');
 
-    // --- RUTE UNTUK HISTORY ---
+
+    // --- RUTE UNTUK HISTORY (SUDAH DIPERBAIKI) ---
     $routes->get('/history', 'History::index');
-    $routes->get('/history/delete/(:num)', 'History::delete/$1');
+    $routes->get('history/delete/(:num)', 'History::delete/$1');
 });
 
 
